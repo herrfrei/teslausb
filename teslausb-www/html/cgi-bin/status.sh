@@ -10,7 +10,7 @@ else
   drives_active=no
 fi
 
-readarray -t snapshots <<<"$(find /backingfiles/snapshots/ -name snap.bin 2> /dev/null | sort)"
+readarray -t snapshots < <(find /backingfiles/snapshots/ -name snap.bin 2> /dev/null | sort)
 readonly numsnapshots=${#snapshots[@]}
 if [[ "$numsnapshots" != "0" ]]
 then
@@ -55,7 +55,7 @@ Content-type: application/json
    "num_snapshots": "$numsnapshots",
    "snapshot_oldest": "$oldestsnapshot",
    "snapshot_newest": "$newestsnapshot",
-   $(eval "$(stat --file-system --format='echo -e \"total_space\": \"$((%b*%S))\",\\\n\ \ \ \"free_space\": \"$((%f*%S))\",' /backingfiles/cam_disk.bin)")
+   $(eval "$(stat --file-system --format='echo -e \"total_space\": \"$((%b*%S))\",\\\n\ \ \ \"free_space\": \"$((%f*%S))\",' /backingfiles/.)")
    "uptime": "$ut",
    "drives_active": "$drives_active",
    "wifi_ssid": "$wifi_ssid",

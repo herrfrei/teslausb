@@ -239,7 +239,9 @@ iframe {
 }
 
 /*hide music tab by default */
-.tablabel6 {
+.tablabel5,
+.tablabel6,
+.tablabel7 {
   display: none;
 }
 
@@ -1211,12 +1213,28 @@ function starttailing({url, pre, button}) {
   request.send();
 }
 
+function readyState(state) {
+  if (state == 0) {
+    return "UNSENT";
+  } else if (state == 1) {
+    return "OPENED";
+  } else if (state == 2) {
+    return "HEADERS_RECEIVED";
+  } else if (state == 3) {
+    return "LOADING";
+  } else if (state == 4) {
+    return "DONE";
+  } else {
+    return "UNKNOWN";
+  }
+}
+
 function readfile({url, callback, callbackarg, pre, tail, button}) {
   var request = new XMLHttpRequest();
   request.open('GET', cachebustingurl(url));
   log("reading " + url);
   request.onreadystatechange = function () {
-    log("read " + url + ", result: " + request.status);
+    log(`read ${url}, result: ${request.status}, state: ${readyState(request.readyState)}`);
     if (request.readyState === 4 && request.status === 200) {
       var type = request.getResponseHeader('Content-Type');
       if (type.indexOf("text") !== 1) {
@@ -1630,6 +1648,20 @@ function readconfig() {
         ...config.has_boombox == "yes" ? [{ path: "fs/Boombox", label: "Boombox" }] : []
       ]);
     }
+    if (config.has_cam == "yes") {
+      const recordingstab = document.querySelector(".tablabel5");
+      const viewertab = document.querySelector(".tablabel7");
+      recordingstab.style.display = "inline-block";
+      viewertab.style.display = "inline-block";
+    } else if (numdrives > 0) {
+      const filesbtn = document.querySelector("#tab6");
+      filesbtn.checked = true;
+    } else {
+      const toolsbtn = document.querySelector("#tab4");
+      toolsbtn.checked = true;
+    }
+
+
   }});
 }
 
