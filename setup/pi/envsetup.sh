@@ -114,7 +114,7 @@ function read_setup_variables {
   SAMBA_ENABLED=${SAMBA_ENABLED:-false}
   SAMBA_GUEST=${SAMBA_GUEST:-false}
   INCREASE_ROOT_SIZE=${INCREASE_ROOT_SIZE:-0}
-  export CAM_SIZE=${CAM_SIZE:-90%}
+  export CAM_SIZE=${CAM_SIZE:-0}
   export MUSIC_SIZE=${MUSIC_SIZE:-0}
   export BOOMBOX_SIZE=${BOOMBOX_SIZE:-0}
   export LIGHTSHOW_SIZE=${LIGHTSHOW_SIZE:-0}

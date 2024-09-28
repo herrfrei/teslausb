@@ -1,13 +1,16 @@
 #!/bin/bash -eu
 
 function ensure_archive_is_mounted () {
-  log "Ensuring cam archive is mounted..."
-  if ensure_mountpoint_is_mounted_with_retry "$ARCHIVE_MOUNT"
+  if [ -e "$ARCHIVE_MOUNT" ]
   then
-    log "Ensured cam archive is mounted."
-  else
-    log "Failed to mount cam archive."
-    return 1
+    log "Ensuring cam archive is mounted..."
+    if ensure_mountpoint_is_mounted_with_retry "$ARCHIVE_MOUNT"
+    then
+      log "Ensured cam archive is mounted."
+    else
+      log "Failed to mount cam archive."
+      return 1
+    fi
   fi
   if [ -e "$MUSIC_ARCHIVE_MOUNT" ]
   then

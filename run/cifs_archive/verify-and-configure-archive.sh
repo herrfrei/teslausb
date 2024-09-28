@@ -114,7 +114,11 @@ install_required_packages
 
 check_archive_server_reachable
 
-check_archive_mountable "$ARCHIVE_SERVER" "$SHARE_NAME"
+if [ -e /backingfiles/cam_disk.bin ]
+then
+  check_archive_mountable "$ARCHIVE_SERVER" "$SHARE_NAME"
+fi
+
 if [ -n "${MUSIC_SHARE_NAME:+x}" ]
 then
   if [ "$MUSIC_SIZE" = "0" ]
@@ -131,7 +135,7 @@ function configure_archive () {
   local archive_path="/mnt/archive"
   local music_archive_path="/mnt/musicarchive"
 
-  if [ ! -e "$archive_path" ]
+  if [ ! -e "$archive_path" ] && [ -e /backingfiles/cam_disk.bin ]
   then
     mkdir "$archive_path"
   fi
@@ -140,8 +144,13 @@ function configure_archive () {
   write_archive_configs_to "$credentials_file_path"
 
   sed -i "/^.*\.teslaCamArchiveCredentials.*$/ d" /etc/fstab
-  local sharenameforstab="${SHARE_NAME// /\\040}"
-  echo "//$ARCHIVE_SERVER/$sharenameforstab $archive_path cifs noauto,credentials=${credentials_file_path},iocharset=utf8,file_mode=0777,dir_mode=0777,$VERS_OPT,$SEC_OPT 0" >> /etc/fstab
+
+
+  if [ -e /backingfiles/cam_disk.bin ]
+  then
+    local sharenameforstab="${SHARE_NAME// /\\040}"
+    echo "//$ARCHIVE_SERVER/$sharenameforstab $archive_path cifs noauto,credentials=${credentials_file_path},iocharset=utf8,file_mode=0777,dir_mode=0777,$VERS_OPT,$SEC_OPT 0" >> /etc/fstab
+  fi
 
   if [ -n "${MUSIC_SHARE_NAME:+x}" ]
   then

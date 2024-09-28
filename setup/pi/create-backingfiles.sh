@@ -224,8 +224,13 @@ then
   exit 1
 fi
 
-add_drive "cam" "CAM" "$CAM_DISK_SIZE" "$CAM_DISK_FILE_NAME" "$USE_EXFAT"
-log_progress "created camera backing file"
+if [ "$CAM_DISK_SIZE" -gt 0 ]
+then
+  add_drive "cam" "CAM" "$CAM_DISK_SIZE" "$CAM_DISK_FILE_NAME" "$USE_EXFAT"
+  log_progress "created camera backing file"
+else
+  log_progress "skipping camera backing file"
+fi
 
 REMAINING_SPACE="$(available_space)"
 
