@@ -702,7 +702,7 @@ video {
 
 .status_wifi {
   margin: auto;
-  display: flex;
+  display: none;
   flex-direction: row;
 }
 
@@ -737,6 +737,7 @@ video {
 }
 
 .pistatus {
+  min-height: 127px;
   position: relative;
   padding: 5px;
   margin-bottom: 10px;
@@ -746,6 +747,10 @@ video {
 /* put some vertical spacing between the children of the status area */
 .pistatus > *:not(:last-child) {
   margin-bottom: 3px;
+}
+
+.status_ether {
+  display: none;
 }
 
 </style>
@@ -841,7 +846,7 @@ video {
           </span>
         </div>
       </div>
-      <button class="group2" id="toggledrives" onclick="toggledrivesfunc();"></button>
+      <button class="group2" id="toggledrives" onclick="toggledrivesfunc();">...</button>
       <p>
       <button class="group2" onclick="syncfunc();">Trigger archive/sync</button>
       <span id="synctext" style="padding-left:20px;"></span>
@@ -1570,6 +1575,8 @@ function showstatus() {
         }
         etherinfospan.innerText = etherinfo;
       }
+      var wifiinfodiv = document.querySelector(".status_wifi");
+      wifiinfodiv.style.display="flex";
       var wifiinfospan = document.querySelector(".status_wifi_info");
       var wifiinfo;
       var wifiicon = document.querySelector(".wifi-icon");
