@@ -1565,7 +1565,7 @@ function showstatus() {
       if (statusvals.ether_speed == "") {
         etherdiv.style.display="none";
       } else {
-        etherdiv.style.display="";
+        etherdiv.style.display="inherit";
         var etherinfospan = document.querySelector(".status_ether_info");
         var etherinfo="";
         if (statusvals.ether_speed == "Unknown!") {
