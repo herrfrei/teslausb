@@ -258,7 +258,7 @@ function check_if_usb_gadget_is_mounted () {
   LUNFILE=/sys/kernel/config/usb_gadget/teslausb/configs/c.1/mass_storage.0/lun.0/file
   if [ -n "$(cat /sys/kernel/config/usb_gadget/teslausb/UDC)" ] &&
      [ -e "$LUNFILE" ] &&
-     [ "$(cat $LUNFILE)" = /backingfiles/cam_disk.bin ]
+     [ -n "$(cat $LUNFILE)" ]
   then
     return
   fi
@@ -628,6 +628,10 @@ function copy_music_files () {
   unmount_music_file
 }
 
+function has_cam_disk () {
+  [ -f /backingfiles/cam_disk.bin ]
+}
+
 function archive_clips () {
   log "Archiving..."
 
@@ -637,7 +641,10 @@ function archive_clips () {
     return
   fi
 
-  if archive_teslacam_clips
+  if ! has_cam_disk
+  then
+    log "Skipping archiving (no cam disk)"
+  elif archive_teslacam_clips
   then
     log "Finished archiving."
   else
@@ -797,14 +804,21 @@ set_sys_param /proc/sys/vm/dirty_background_bytes DIRTY_BACKGROUND_BYTES 65536
 set_sys_param /proc/sys/vm/dirty_ratio DIRTY_RATIO 80
 set_sys_param /sys/devices/system/cpu/cpufreq/policy0/scaling_governor CPU_GOVERNOR conservative
 
-snapshotloop &
+if has_cam_disk
+then
+  snapshotloop &
+fi
 logrotator &
 wifichecker &
 
 fix_errors_in_images
-/root/bin/make_snapshot.sh nofsck
 
-clean_cam_mount
+if has_cam_disk
+then
+  /root/bin/make_snapshot.sh nofsck
+
+  clean_cam_mount
+fi
 
 if archive_is_reachable
 then
@@ -844,7 +858,10 @@ do
   sleep "${ARCHIVE_DELAY:-20}"
 
   # take a snapshot before archive_clips starts deleting files
-  /root/bin/make_snapshot.sh
+  if has_cam_disk
+  then
+    /root/bin/make_snapshot.sh
+  fi
 
   archive_clips
 
