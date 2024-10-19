@@ -140,6 +140,7 @@ details > ul.fb-droptarget {
 }
 
 .fb-treerootpath {
+  position: relative;
   padding: 0 2px 0 2px;
   font-weight: bold;
   font-size: larger;
@@ -149,6 +150,57 @@ details > ul.fb-droptarget {
   min-height: 25px;
   max-height: 25px;
   margin: auto 5px auto 5px;
+}
+
+.fb-diskinfo-outer {
+  position: absolute;
+  right: -4px;
+  bottom: 0;
+  width: 26px;
+  height: 26px;
+  background: white;
+}
+
+.fb-diskinfo-inner {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-color: #444;
+  border: 1px solid;
+  border-radius: 50%;
+  font-weight: lighter;
+  color: #444;
+  text-align: center;
+  font-size: smaller;
+}
+
+.fb-diskinfo-inner::before {
+  content: 'i';
+}
+
+.fb-diskinfo-outer:hover .fb-diskinfo-inner {
+  color: darkblue;
+  background: lightblue;
+}
+
+.fb-diskinfo {
+  visibility: hidden;
+  position: fixed;
+  margin-top: 20px;
+  height: 20px;
+  width: auto;
+  z-index: 1;
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 5px 4px 3px 4px;
+  text-align: center;
+  background: lightgrey;
+}
+
+.fb-diskinfo-outer:hover .fb-diskinfo {
+  visibility: visible;
 }
 
 .fb-treerootpath:has(.fb-treerootpathsinglelabel) {

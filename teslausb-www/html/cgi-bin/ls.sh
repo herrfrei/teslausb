@@ -29,4 +29,5 @@ EOF
 {
   find "$lspath" -mindepth 1 -maxdepth 1 \( -type d -printf 'd:%p\n' \) -o -printf "f:%p:%s\n"
   find "$lspath" -mindepth 2 -maxdepth 2 \( -type d -printf 'D:%p\n' -prune \)
+  eval "$(stat --file-system --format="echo s:\$((%f*%S)):\$((%b*%S))" "$lspath/.")"
 } | sed 's/:\.\//:/' | LC_ALL=C sort -f

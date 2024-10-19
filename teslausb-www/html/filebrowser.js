@@ -87,7 +87,7 @@ class FileBrowser {
       for (var i = 0; i < this.drives.length; i++) {
         rootlabeldropdown += `<option value="${i}">${this.drives[i].label}</option>`
       }
-      rootlabeldropdown += "</select>"
+      rootlabeldropdown += '</select><span class="fb-diskinfo-outer"><div class="fb-diskinfo-inner"><span class="fb-diskinfo"></span></div></span>'
       rootlabel.innerHTML = rootlabeldropdown;
       const selector = this.anchor_elem.querySelector(".fb-driveselector");
       selector.onchange = (e) => {
@@ -99,7 +99,7 @@ class FileBrowser {
         this.updateButtonBar();
       };
     } else {
-      rootlabel.innerHTML = `<span class="fb-treerootpathsinglelabel">${this.drives[0].label}</span>`;
+      rootlabel.innerHTML = `<span class="fb-treerootpathsinglelabel">${this.drives[0].label}</span><span class="fb-diskinfo-outer"><div class="fb-diskinfo-inner"><span class="fb-diskinfo"></span></div></span>`;
     }
 
     this.buttonbar = this.anchor_elem.querySelector(".fb-buttonbar");
@@ -751,6 +751,11 @@ class FileBrowser {
     listDiv.appendChild(newFile);
   }
 
+  setDiskStats(freebytes, totalbytes) {
+    var diskinfospan = this.anchor_elem.querySelector('.fb-diskinfo');
+    diskinfospan.innerText = `${this.niceNumber(freebytes)} free of ${this.niceNumber(totalbytes)}`;
+  }
+
   /*
     switchtopath=false: only update the left-hand side tree view
     switchtopath=true: update the right-hand side
@@ -776,7 +781,10 @@ class FileBrowser {
       if (line.indexOf("d:") == 0 || line.indexOf("D:") == 0) {
         this.addDir(root, line.substring(2));
       }
-      if (switchtopath && ! line.indexOf("D:") == 0) {
+      if (line.indexOf("s:") == 0) {
+        let [freebytes, totalbytes] = line.substring(2).split(":");
+        this.setDiskStats(freebytes, totalbytes);
+      } else if (switchtopath && ! line.indexOf("D:") == 0) {
         this.addFileEntry(line);
       }
     }
