@@ -130,9 +130,40 @@ EOF
   echo "BOOT_DISK: $BOOT_DISK"
 }
 
+# image with gpt partition layout and three partitions
+# on it already, but with the on-disk order not matching
+# the partition table order.
+function makeubuntulikeimage {
+  local img="$1"
+  truncate -s $((64*1024*1024*1024)) "$img"
+
+  sfdisk -X gpt "$img" << EOF
+2560M,3G
+12M,500M
+512M,2G
+EOF
+
+  fdisk -l "$img"
+
+  LOOP=$(sudo losetup --find --partscan --show "$img")
+
+  mkfs.ext4 "${LOOP}p1" &>> "$LOG"
+  mkfs.vfat "${LOOP}p2" &>> "$LOG"
+  mkfs.ext4 "${LOOP}p3" &>> "$LOG"
+
+  export BOOT_DISK="$LOOP"
+  export DATA_DRIVE=""
+  export CMDLINE_PATH="/dev/null"
+  export BOOT_DEVICE_PARTITION_PREFIX="${LOOP}p"
+
+  echo "BOOT_DISK: $BOOT_DISK"
+}
+
+
 SUCCESS=true
 
 function checksuccess {
+  printf 'Starting "%s"\n' "$1"
   cp /etc/fstab /etc/fstab.org
   if ../setup/pi/create-backingfiles-partition.sh /backingfiles /mutable && checknewpartitions
   then
@@ -147,6 +178,7 @@ function checksuccess {
 }
 
 function checkfailure {
+  printf 'Starting "%s"\n' "$1"
   if ! ../setup/pi/create-backingfiles-partition.sh
   then
     printf '%-45s %s\n' "$1" OK
@@ -215,6 +247,11 @@ checkenv
   makearmbianlikeimage "$ROOT_IMAGE"
   checksuccess "one partition"
   checksuccess "one partition repeat"
+  deleteimage
+
+  makeubuntulikeimage "$ROOT_IMAGE"
+  checksuccess "out of order partitions"
+  checksuccess "out of order partitions repeat"
   deleteimage
 
   maketriplepartdosimage "$ROOT_IMAGE"

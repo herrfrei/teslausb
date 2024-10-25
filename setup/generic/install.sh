@@ -40,7 +40,7 @@ rootdev="/dev/${rootname}"
 marker="/root/RESIZE_ATTEMPTED"
 
 # Check that the root partition is the last one.
-lastpart=$(sfdisk -l "$rootdev" | tail -1 | awk '{print $1}')
+lastpart=$(sfdisk -q -l "$rootdev" | tail +2 | sort -n -k 2 | tail -1 | awk '{print $1}')
 
 # Check if there is sufficient unpartitioned space after the last
 # partition to create the backingfiles and mutable partitions.
@@ -64,7 +64,7 @@ then
   devsectorsize=$(cat "/sys/block/${rootname}/queue/hw_sector_size")
   read -r fsblockcount fsblocksize < <(tune2fs -l "${rootpart}" | grep "Block count:\|Block size:" | awk ' {print $2}' FS=: | tr -d ' ' | tr '\n' ' ' | (cat; echo))
   fsnumsectors=$((fsblockcount * fsblocksize / devsectorsize))
-  partnumsectors=$(sfdisk -l -o Sectors "${rootdev}" | tail -1)
+  partnumsectors=$(sfdisk -q -l -o Sectors "${rootdev}" | tail +2 | sort -n | tail -1)
   partnumsectors=$((partnumsectors - 1));
   if [ "$partnumsectors" -le "$fsnumsectors" ]
   then
@@ -122,7 +122,7 @@ then
   # shrink root partition to match root file system size
   echo "shrinking root partition to match root fs, $fsnumsectors sectors"
   sleep 3
-  rootpartstartsector=$(sfdisk -l -o Start "${rootdev}" | tail -1)
+  rootpartstartsector=$(sfdisk -q -l -o Start "${rootdev}" | tail +2 | sort -n | tail -1)
   partnum=${rootpart:0-1}
 
   echo "${rootpartstartsector},${fsnumsectors}" | sfdisk --force "${rootdev}" -N "${partnum}"

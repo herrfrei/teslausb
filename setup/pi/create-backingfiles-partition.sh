@@ -82,7 +82,7 @@ else
   echo "DATA_DRIVE not set. Proceeding to SD card setup"
 fi
 
-readonly LAST_PARTITION_DEVICE=$(sfdisk -l "$BOOT_DISK" | tail -1 | awk '{print $1}')
+readonly LAST_PARTITION_DEVICE=$(sfdisk -q -l "$BOOT_DISK" | tail -1 | awk '{print $1}')
 readonly LAST_PART_NUM=${LAST_PARTITION_DEVICE:0-1}
 readonly SECOND_TO_LAST_PART_NUM=$((LAST_PART_NUM - 1))
 readonly SECOND_TO_LAST_PARTITION_DEVICE=${LAST_PARTITION_DEVICE:0:-1}${SECOND_TO_LAST_PART_NUM}
@@ -159,12 +159,9 @@ LAST_DISK_SECTOR=$((DISK_SECTORS - 1))
 # mutable partition is 100MB at the end of the disk, calculate its start sector
 FIRST_MUTABLE_SECTOR=$((LAST_DISK_SECTOR-204800+1))
 # backingfiles partition sits between the last and mutable partition, calculate its start sector and size
-LAST_PART_SECTOR=$(sfdisk -l "${BOOT_DISK}" | grep "${LAST_PARTITION_DEVICE}" | awk '{print $3}')
+LAST_PART_SECTOR=$(sfdisk -q -l "${BOOT_DISK}" | tail +2 | sort -n -k 2 | tail -1 | awk '{print $3}')
 FIRST_BACKINGFILES_SECTOR=$((LAST_PART_SECTOR + 1))
 BACKINGFILES_NUM_SECTORS=$((FIRST_MUTABLE_SECTOR - FIRST_BACKINGFILES_SECTOR))
-
-echo firstbackingfilesmutable $FIRST_BACKINGFILES_SECTOR
-echo first mutable $FIRST_MUTABLE_SECTOR
 
 # As a rule of thumb, one gigabyte of /backingfiles space can hold about 36
 # recording files. We need enough inodes in /mutable to create symlinks to
