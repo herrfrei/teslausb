@@ -275,6 +275,7 @@ function update_backingfiles_fstab_entry () {
   sed -i "\@^$filename .*@d" /etc/fstab
   if [ -e "$filename" ]
   then
+    mkdir -p "$mountpoint"
     echo "$filename $mountpoint teslausb noauto 0 0" >> /etc/fstab
     setup_progress "updated /etc/fstab for $mountpoint"
   fi
