@@ -242,37 +242,31 @@ export WIFIPASS='your_pass'
 # export TRIGGER_FILE_RECENT=ARCHIVE_UPLOADED
 # export TRIGGER_FILE_ANY=ARCHIVE_UPLOADED
 
-# TeslaUSB can optionally use the Tesla API to keep your car awake, so it can
-# power the Pi long enough for the archiving process to complete. To enable
-# that, provide your Tesla account refresh_token.
-# TeslaUSB will only send your credentials to the Tesla API itself.
+############################################################################
+# KEEPING THE CAR AWAKE DURING ARCHIVING USING THE TESLA API NO LONGER WORKS
 #
-# NOTE:  if you do this, it's highly recommended that you set up 'PIN to Drive'
-#   as if the Pi or the car is stolen, the thief has access to your Tesla
-#   account through that token, add their own devices as a key, steal the car,
-#   etc.
-#   If either is stolen, CHANGE YOUR TESLA PASSWORD IMMEDIATELY.
+# Recent car firmware turns off USB ports very shortly after you get out of
+# the car, and changes to the Tesla API make it impossible for TeslaUSB to
+# keep the car awake or turn on Sentry mode in order to keep the USB ports
+# powered. This means that to keep the USB ports powered so that TeslaUSB
+# can finish archiving you need to turn on Sentry mode manually using the
+# Tesla app (or have it enabled by default for your home location).
+# Turning on Camp mode keeps the USB ports powered as well, but turns on
+# climate control which uses a lot of power.
+# If you turn on Sentry or Camp mode manually, you should probably set up
+# one of the notification mechanisms (see above) to let you know when
+# archiving finishes, so you can remember to turn Sentry/Camp mode off again.
+# It has been reported that some car models keep the USB ports powered
+# while the car is charging.
+# You could also consider using a power bank or UPS hat to keep TeslaUSB
+# powered independent of the power state of the car's USB ports. See the
+# TeslaUSB wiki for more info.
 #
-# ALSO NOTE: having sentry mode enabled in your Tesla will keep your car awake.
-#   But, make sure you have not excluded your home in the sentry mode settings.
+# It may also be possible to use Tessie or TeslaFi to keep the USB ports
+# powered (both are paid services) by defining the variables below.
 #
-# GENERATE THE TOKEN: To generate the token use one of the apps below, you will
-#   need to login with your tesla account, and then copy the refresh_token
-#
-# Android: https://play.google.com/store/apps/details?id=net.leveugle.teslatokens
-# iOS: https://apps.apple.com/us/app/auth-app-for-tesla/id1552058613#?platform=iphone
-#
-# TeslaFi or Tessie Subscriber?
-#   If you're a TeslaFi or Tessie user, you may consider keeping the car awake using
-#   one of their APIs instead. The advantage is not having to expose Tesla's Token
-#   and other info in this file as plain text, which is a vulnerability (as
-#   noted above. 'PIN to Drive' is not necessary in this case.
-#   TeslaFi and Tessie's API token can easily be revoked and a new one generated at
-#   anytime. TeslaFi also allows selective command(s) enablement (e.g. disable
-#   uneeded commands), further decreasing vulnerability.
-# 
 # IMPORTANT: Only ONE API should be used at the same time. 
-# Do not include API tokens for more than one of TeslaFi, Tessie or Tesla.
+# Do not include API tokens for both TeslaFi and Tessie.
 # 
 # How to generate TeslaFi API Tokens
 # GENERATE/REVOKE TESLAFI API TOKEN: Log into your TeslaFi account.
@@ -286,30 +280,15 @@ export WIFIPASS='your_pass'
 # GENERATE/REVOKE TESSIE API TOKEN: Log into your Tessie account.
 #   Navigate to Settings -> Developer API -> Generate access token
 #
-# export TESLA_REFRESH_TOKEN='YOUR_REFRESH_TOKEN_GOES_HERE'
 # export TESLAFI_API_TOKEN='YOUR_TESLAFI_API_TOKEN_GOES_HERE'
 # export TESSIE_API_TOKEN='YOUR_TESSIE_API_TOKEN_GOES_HERE'
 #
-# TESSIE API ONLY (Do not configure if using TeslaFi/Tesla API):
+# TESSIE API ONLY (Do not configure if using TeslaFi API):
 # The Tessie API requires the vehicle's VIN number to issue commands to it,
 # regardless of whether you only have one vehicle on the account or not.
 # export TESSIE_VIN=5YJ3E1EA4JF000001
-#
-# TESLA API ONLY (Do not configure if using TeslaFi/Tessie API):
-# If you have more than one Tesla vehicle on the account, you must also provide
-# the name or VIN for the vehicle for which this TeslaUSB install will be used,
-# so that TeslaUSB can keep the correct vehicle awake.
-# If you only have one car on the account, you do not need to specify this.
-# export TESLA_NAME="Elon's CyberTruck"
-# export TESLA_VIN=5YJ3E1EA4JF000001
-#
-# TESLA API ONLY (Do not configure if using TeslaFi/Tessie API):
-# By default, TeslaUSB uses a combination of APIs to keep the car awake,
-# similar to how to the Tesla app can wake up the car.
-# If you find your car isn't staying awake, you can try setting the
-# following to "sentry" to keep the car awake by temporarily turning
-# on Sentry mode while archiving.
-# export TESLA_WAKE_MODE=stream
+############################################################################
+
 
 # Uncomment if you want to increase the size of the root
 # filesystem so there's extra space for installing additional
