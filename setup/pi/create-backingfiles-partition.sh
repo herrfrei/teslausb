@@ -156,8 +156,8 @@ log_progress "Checking existing partitions..."
 
 DISK_SECTORS=$(blockdev --getsz "${BOOT_DISK}")
 LAST_DISK_SECTOR=$((DISK_SECTORS - 1))
-# mutable partition is 100MB at the end of the disk, calculate its start sector
-FIRST_MUTABLE_SECTOR=$((LAST_DISK_SECTOR-204800+1))
+# mutable partition is 300MB at the end of the disk, calculate its start sector
+FIRST_MUTABLE_SECTOR=$((LAST_DISK_SECTOR-614400+1))
 # backingfiles partition sits between the last and mutable partition, calculate its start sector and size
 LAST_PART_SECTOR=$(sfdisk -q -l "${BOOT_DISK}" | tail +2 | sort -n -k 2 | tail -1 | awk '{print $3}')
 FIRST_BACKINGFILES_SECTOR=$((LAST_PART_SECTOR + 1))
