@@ -546,7 +546,7 @@ function archive_teslacam_clips () {
     if [ -n "${TRIGGER_FILE_RECENT+x}" ]
     then
       touch "${triggerdir}/RecentClips/${TRIGGER_FILE_RECENT}"
-      echo "SentryClips/${TRIGGER_FILE_RECENT}" >> "${triggerlist}"
+      echo "RecentClips/${TRIGGER_FILE_RECENT}" >> "${triggerlist}"
     fi
     if [ -n "${TRIGGER_FILE_ANY+x}" ]
     then
