@@ -28,7 +28,7 @@ then
 fi
 
 function setup_progress () {
-  local setup_logfile=/boot/teslausb-headless-setup.log
+  local setup_logfile=/teslausb/teslausb-headless-setup.log
   if [ -w $setup_logfile ]
   then
     echo "$( date ) : $*" >> "$setup_logfile"
@@ -133,9 +133,9 @@ then
   REBOOT=true
 fi
 
-BOOT_DISK=$(lsblk -dpno pkname "$(findmnt -D -no SOURCE --target /boot)")
+BOOT_DISK=$(lsblk -dpno pkname "$(findmnt -D -no SOURCE --target /teslausb)")
 declare -rx BOOT_DISK
-BOOT_PARTITION_DEVICE=$(lsblk -dpno name "$(findmnt -D -no SOURCE --target /boot)")
+BOOT_PARTITION_DEVICE=$(lsblk -dpno name "$(findmnt -D -no SOURCE --target /teslausb)")
 readonly BOOT_PARTITION_DEVICE
 readonly BOOT_DEVICE_PARTITION_PREFIX=${BOOT_PARTITION_DEVICE%?}
 export BOOT_DEVICE_PARTITION_PREFIX
@@ -175,9 +175,9 @@ then
 fi
 
 function headless_setup_mark_setup_success () {
-  rm -f /boot/TESLAUSB_SETUP_FAILED
-  rm -f /boot/TESLAUSB_SETUP_STARTED
-  touch /boot/TESLAUSB_SETUP_FINISHED
+  rm -f /teslausb/TESLAUSB_SETUP_FAILED
+  rm -f /teslausb/TESLAUSB_SETUP_STARTED
+  touch /teslausb/TESLAUSB_SETUP_FINISHED
 }
 
 function flash () {
@@ -518,7 +518,7 @@ function cmd_selfupdate {
 }
 
 function cmd_upgrade {
-  if [ ! -e /boot/TESLAUSB_SETUP_FINISHED ]
+  if [ ! -e /teslausb/TESLAUSB_SETUP_FINISHED ]
   then
     echo "STOP: previous setup didn't finish, can't upgrade unfinished install"
     exit 1
@@ -542,6 +542,18 @@ function cmd_upgrade_prepare {
     umount /mnt/archive /mnt/musicarchive || true
     /root/bin/disable_gadget.sh || true
     /root/bin/remountfs_rw
+    # a previous bookworm install may have the makers in /boot, so move
+    # them to /teslausb (/boot/firmware)
+    if [ ! /boot -ef /teslausb ]
+    then
+      for i in WIFI_ENABLED TESLAUSB_SETUP_STARTED TESLAUSB_SETUP_FINISHED
+      do
+        if [ -e "/boot/$i" ]
+        then
+          mv "/boot/$i" /teslausb
+        fi
+      done
+    fi
   ) &> /dev/null
 }
 
@@ -575,7 +587,7 @@ function checkfsrw() {
 }
 
 function boot_is_not_on_root {
-  [ "$(stat -c "%d" /)" -ne "$(stat -c "%d" /boot)" ]
+  [ "$(stat -c "%d" /)" -ne "$(stat -L -c "%d" /teslausb)" ]
 }
 
 function diagnose {
@@ -669,7 +681,7 @@ function diagnose {
     numsnapshots=$( mount | grep -c snapshot )
     echo "$numsnapshots snapshots mounted"
 
-    if [ ! -e /boot/TESLAUSB_SETUP_FINISHED ]
+    if [ ! -e /teslausb/TESLAUSB_SETUP_FINISHED ]
     then
       echo 'ERROR: setup did not finish'
     fi
@@ -708,7 +720,7 @@ function diagnose {
     checkfsrw / ro
     if boot_is_not_on_root
     then
-      checkfsrw /boot ro
+      checkfsrw /teslausb ro
     fi
     checkfsrw /backingfiles rw
     checkfsrw /mutable rw
@@ -749,7 +761,7 @@ function diagnose {
     else
       echo "no boombox disk image found"
     fi
-    df -h /boot/ / /backingfiles/ /mutable/
+    df -h /teslausb/ / /backingfiles/ /mutable/
     echo -e "====== network ======"
     ifconfig
     iwconfig wlan0 | grep Link
@@ -781,9 +793,9 @@ function diagnose {
     journalctl -u rc-local
 
     echo -e "====== setup log ======"
-    if [ -e /boot/teslausb-headless-setup.log ]
+    if [ -e /teslausb/teslausb-headless-setup.log ]
     then
-      cat /boot/teslausb-headless-setup.log
+      cat /teslausb/teslausb-headless-setup.log
     else
       echo "no setup log found"
     fi
@@ -999,6 +1011,14 @@ then
 		TESLAUSB_TIP1
 	fi
 	EOC
+  fi
+  if grep -q "/boot/TESLAUSB_SETUP_FINISHED" "/home/$DEFUSER/.bashrc"
+  then
+    sed -i "s@/boot/TESLAUSB_SETUP_FINISHED@/teslausb/TESLAUSB_SETUP_FINISHED@" "/home/$DEFUSER/.bashrc"
+  fi
+  if grep -q "/boot/TESLAUSB_SETUP_FINISHED" "/root/.bashrc"
+  then
+    sed -i "s@/boot/TESLAUSB_SETUP_FINISHED@/teslausb/TESLAUSB_SETUP_FINISHED@" "/root/.bashrc"
   fi
 fi
 

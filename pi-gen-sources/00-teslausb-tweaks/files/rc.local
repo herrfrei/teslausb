@@ -18,15 +18,26 @@ then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-if [ -f /boot/run_once ]
+if [ ! -L /teslausb ]
 then
-  cp /boot/run_once /tmp/
-  chmod +x /tmp/run_once
-  /tmp/run_once || echo "run_once failed"
-  mv /boot/run_once /boot/ran_once || true
+  rm -rf /teslausb
+  if [ -d /boot/firmware ] && findmnt --fstab /boot/firmware &> /dev/null
+  then
+    ln -s /boot/firmware /teslausb
+  else
+    ln -s /boot /teslausb
+  fi
 fi
 
-SETUP_LOGFILE=/boot/teslausb-headless-setup.log
+if [ -f /teslausb/run_once ]
+then
+  cp /teslausb/run_once /tmp/
+  chmod +x /tmp/run_once
+  /tmp/run_once || echo "run_once failed"
+  mv /teslausb/run_once /teslausb/ran_once || true
+fi
+
+SETUP_LOGFILE=/teslausb/teslausb-headless-setup.log
 
 function write_all_leds {
   for led in /sys/class/leds/*
@@ -79,17 +90,17 @@ function enable_wifi () {
   setup_progress "Detecting whether to update wpa_supplicant.conf"
   if [[ -n "$SSID" ]] && [[ -n "$WIFIPASS" ]]
   then
-    if [ ! -e /boot/WIFI_ENABLED ]
+    if [ ! -e /teslausb/WIFI_ENABLED ]
     then
       if [ -e /root/bin/remountfs_rw ]
       then
         /root/bin/remountfs_rw
       fi
-      setup_progress "Wifi variables specified, and no /boot/WIFI_ENABLED. Building wpa_supplicant.conf."
-      cp /boot/wpa_supplicant.conf.sample /boot/wpa_supplicant.conf
-      sed -i -e "sTEMPSSID${SSID}g" /boot/wpa_supplicant.conf
-      sed -i -e "sTEMPPASS${WIFIPASS}g" /boot/wpa_supplicant.conf
-      cp /boot/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf
+      setup_progress "Wifi variables specified, and no /teslausb/WIFI_ENABLED. Building wpa_supplicant.conf."
+      cp /teslausb/wpa_supplicant.conf.sample /teslausb/wpa_supplicant.conf
+      sed -i -e "sTEMPSSID${SSID}g" /teslausb/wpa_supplicant.conf
+      sed -i -e "sTEMPPASS${WIFIPASS}g" /teslausb/wpa_supplicant.conf
+      cp /teslausb/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf
 
       # set the host name now if possible, so it's effective immediately after the reboot
       local old_host_name
@@ -108,7 +119,7 @@ function enable_wifi () {
       done
       systemctl enable ssh
 
-      touch /boot/WIFI_ENABLED
+      touch /teslausb/WIFI_ENABLED
       setup_progress "Rebooting..."
       exec reboot
     fi
@@ -134,19 +145,19 @@ EOF
   source "$1"
 }
 
-if [ -e "/boot/teslausb_setup_variables.conf" ]
+if [ -e "/teslausb/teslausb_setup_variables.conf" ]
 then
   if [ -e /root/bin/remountfs_rw ]
   then
     /root/bin/remountfs_rw
   fi
-  mv /boot/teslausb_setup_variables.conf /root/
+  mv /teslausb/teslausb_setup_variables.conf /root/
   dos2unix /root/teslausb_setup_variables.conf
 fi
 if [ -e "/root/teslausb_setup_variables.conf" ]
 then
   safesource /root/teslausb_setup_variables.conf
-elif [ -e "/boot/teslausb_setup_variables.conf.sample" ]
+elif [ -e "/teslausb/teslausb_setup_variables.conf.sample" ]
 then
   setup_progress "no config file found, but sample file is present."
 else
@@ -159,19 +170,19 @@ enable_wifi
 
 # This begins the Headless Setup loop
 # If the FINISHED file does not exist then we start setup. Otherwise passes on to normal loop
-if [ ! -e "/boot/TESLAUSB_SETUP_FINISHED" ]
+if [ ! -e "/teslausb/TESLAUSB_SETUP_FINISHED" ]
 then
   if [ -e /root/bin/remountfs_rw ]
   then
     /root/bin/remountfs_rw
   fi
-  touch "/boot/TESLAUSB_SETUP_STARTED"
+  touch "/teslausb/TESLAUSB_SETUP_STARTED"
 
   # Grab the setup variables. Should still be there since setup isn't finished.
   # This is a double check to cover various scenarios of mixed headless/not headless setup attempts
-  if [ -e "/boot/teslausb_setup_variables.conf" ] && [ ! -e  "/root/teslausb_setup_variables.conf" ]
+  if [ -e "/teslausb/teslausb_setup_variables.conf" ] && [ ! -e  "/root/teslausb_setup_variables.conf" ]
   then
-    mv /boot/teslausb_setup_variables.conf /root/
+    mv /teslausb/teslausb_setup_variables.conf /root/
     dos2unix /root/teslausb_setup_variables.conf
   fi
   if [ -e "/root/teslausb_setup_variables.conf" ]

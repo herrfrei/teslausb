@@ -6,6 +6,18 @@ then
   exit 1
 fi
 
+if [ ! -L /teslausb ]
+then
+  mount / -o remount,rw
+  rm -rf /teslausb
+  if [ -d /boot/firmware ] && findmnt --fstab /boot/firmware &> /dev/null
+  then
+    ln -s /boot/firmware /teslausb
+  else
+    ln -s /boot /teslausb
+  fi
+fi
+
 function safesource {
   cat <<EOF > /tmp/checksetupconf
 #!/bin/bash -eu
@@ -182,22 +194,16 @@ then
   mkdir -p "$STATUSLED"
 fi
 
-if [ -f /boot/firmware/cmdline.txt ]
+if [ -f /teslausb/cmdline.txt ]
 then
-  export CMDLINE_PATH=/boot/firmware/cmdline.txt
-elif [ -f /boot/cmdline.txt ]
-then
-  export CMDLINE_PATH=/boot/cmdline.txt
+  export CMDLINE_PATH=/teslausb/cmdline.txt
 else
   export CMDLINE_PATH=/dev/null
 fi
 
-if [ -f /boot/firmware/config.txt ]
+if [ -f /teslausb/config.txt ]
 then
-  export PICONFIG_PATH=/boot/firmware/config.txt
-elif [ -f /boot/config.txt ]
-then
-  export PICONFIG_PATH=/boot/config.txt
+  export PICONFIG_PATH=/teslausb/config.txt
 else
   export PICONFIG_PATH=/dev/null
 fi

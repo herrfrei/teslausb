@@ -74,7 +74,7 @@ The Pi should be available for `ssh` at `pi@teslausb.local`, over Wifi (if autom
 
 If plugged into just a power source, or your car, give it a few minutes until the LED starts pulsing steadily which means the archive loop is running and you're good to go.
 
-You should see in `/boot` the `TESLAUSB_SETUP_FINISHED` and `WIFI_ENABLED` files as markers of headless setup success as well.
+You should see in `/teslausb` the `TESLAUSB_SETUP_FINISHED` and `WIFI_ENABLED` files as markers of headless setup success as well.
 
 ## Security
 
@@ -96,16 +96,16 @@ Given that the Pi contains sensitive information like your home wifi password an
 ### Troubleshooting
 
 - If everything seems to be working, but you still don't see the USB drive(s) either on your local machine, or in the car, check that you are indeed using a USB data cable, and not a charge-only cable. Also ensure you are plugged into the USB port on the Raspberry PI, and not the power port.
-- `ssh` to `pi@teslausb.local` (assuming Wifi came up, or your Pi is connected to your computer via USB) and look at the `/boot/teslausb-headless-setup.log`.
+- `ssh` to `pi@teslausb.local` (assuming Wifi came up, or your Pi is connected to your computer via USB) and look at the `/teslausb/teslausb-headless-setup.log`.
 - Try `sudo -i` and then run `/etc/rc.local`. The scripts are fairly resilient to restarting and not re-running previous steps, and will tell you about progress/failure.
 - If Wifi didn't come up:
-  - Double-check the SSID and WIFIPASS variables in `teslausb_setup_variables.conf`, and remove `/boot/WIFI_ENABLED`, then booting the SD in your Pi to retry automatic Wifi setup.
+  - Double-check the SSID and WIFIPASS variables in `teslausb_setup_variables.conf`, and remove `WIFI_ENABLED`, then boot the SD in your Pi to retry automatic Wifi setup.
   - If you are using a WiFi network with a _hidden SSID_, edit `/boot/wpa_supplicant.conf.sample` and uncomment the line `scan_ssid=1` in the `network={...}` block.
   - If still no go, re-run `/etc/rc.local`
   - If all else fails, copy `/boot/wpa_supplicant.conf.sample` to `/boot/wpa_supplicant.conf` and edit out the `TEMP` variables to your desired settings.
 - Note: if you get an error about `read-only filesystem`, you may have to `sudo -i` and run `/root/bin/remountfs_rw`.
 - Try `date` to ensure the system clock is set correctly. If it is too far off, SSL/TLS Authentication will fail, preventing the installation from completing. You can set the date like `date -s "2 JAN 2022 15:04:05"`
-- Try `tail -f /boot/teslausb-headless-setup.log` to watch the logs during installation, which may shed some light on any errors occurring. Press `Ctrl-C` to stop watching logs.
+- Try `tail -f /teslausb/teslausb-headless-setup.log` to watch the logs during installation, which may shed some light on any errors occurring. Press `Ctrl-C` to stop watching logs.
 
 More troubleshooting information in the [wiki](https://github.com/marcone/teslausb/wiki/Troubleshooting)
 
@@ -115,9 +115,9 @@ More troubleshooting information in the [wiki](https://github.com/marcone/teslau
 
 When the Pi boots the first time:
 
-- A `/boot/teslausb-headless-setup.log` file will be created and stages logged.
-- Marker files will be created in `boot` like `TESLA_USB_SETUP_STARTED` and `TESLA_USB_SETUP_FINISHED` to track progress.
-- Wifi is detected by looking for `/boot/WIFI_ENABLED` and if not, creates the `wpa_supplicant.conf` file in place, using `SSID` and `WIFIPASS` from `teslausb_setup_variables.conf` and reboots.
+- A `/teslausb/teslausb-headless-setup.log` file will be created and stages logged.
+- Marker files will be created in `teslausb` like `TESLA_USB_SETUP_STARTED` and `TESLA_USB_SETUP_FINISHED` to track progress.
+- Wifi is detected by looking for `/teslausb/WIFI_ENABLED` and if not, creates the `wpa_supplicant.conf` file in place, using `SSID` and `WIFIPASS` from `teslausb_setup_variables.conf` and reboots.
 - The Pi LED will flash patterns (2, 3, 4, 5) as it gets to each stage (labeled in the setup-teslausb script).
 - After the final stage and reboot the LED will go back to normal. Remember, the step to remount the filesystem takes a few minutes.
 

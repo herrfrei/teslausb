@@ -58,7 +58,7 @@ apt-get -y --force-yes install ntp busybox-syslogd; dpkg --purge rsyslog
 
 log_progress "Configuring system..."
 
-# Add fsck.mode=auto, noswap and/or ro to end of /boot/cmdline.txt
+# Add fsck.mode=auto, noswap and/or ro to end of cmdline.txt
 # Remove the fastboot parameter because it makes fsck not run
 remove_cmdline_txt_param fastboot
 append_cmdline_txt_param fsck.mode=auto
@@ -139,6 +139,11 @@ fi
 if ! grep -P -q "/boot\s+vfat\s+.+?(?=,ro)" /etc/fstab
 then
   sed -i -r "s@(/boot\s+vfat\s+\S+)@\1,ro@" /etc/fstab
+fi
+
+if ! grep -P -q "/boot/firmware\s+vfat\s+.+?(?=,ro)" /etc/fstab
+then
+  sed -i -r "s@(/boot/firmware\s+vfat\s+\S+)@\1,ro@" /etc/fstab
 fi
 
 if ! grep -P -q "/\s+ext4\s+.+?(?=,ro)" /etc/fstab
