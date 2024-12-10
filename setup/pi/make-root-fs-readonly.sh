@@ -98,6 +98,14 @@ then
   sed -i 's/Before=.*/After=mutable.mount/' /lib/systemd/system/fake-hwclock.service
 fi
 
+if [ -d /var/lib/NetworkManager/ ] && [ -n "$AP_SSID" ]
+then
+  log_progress "Moving /var/lib/NetworkManager to mutable"
+  mkdir -p /mutable/var/lib/
+  mv /var/lib/NetworkManager /mutable/var/lib/
+  ln -s /mutable/var/lib/NetworkManager/ /var/lib/NetworkManager
+fi
+
 # Create a configs directory for others to use
 if [ ! -e "/mutable/configs" ]
 then
