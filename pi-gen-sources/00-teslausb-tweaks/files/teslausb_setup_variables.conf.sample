@@ -126,7 +126,7 @@ export WIFIPASS='your_pass'
 # Also note that the wifi password must be at least 8 characters.
 #export AP_PASS='password'
 # IP address is optional. The AP will give its clients IP addresses in the
-# x.x.x.100-150 range so make sure you don't put the AP's IP address in
+# x.x.x.10-254 range so make sure you don't put the AP's IP address in
 # that range.
 #export AP_IP='192.168.66.1'
 

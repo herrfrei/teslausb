@@ -138,7 +138,7 @@ then
 	no-dhcp-interface=lo,wlan0
 	bind-interfaces
 	bogus-priv
-	dhcp-range=${NET}.100,${NET}.150,12h
+	dhcp-range=${NET}.10,${NET}.254,12h
 	# don't configure a default route, we're not a router
 	dhcp-option=3
 	EOF
