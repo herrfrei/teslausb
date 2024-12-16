@@ -12,8 +12,14 @@ modprobe -r g_ether
 export LOG_FILE=/mutable/archiveloop.log
 
 function log () {
-  echo -n "$( date ): " >> "$LOG_FILE"
-  echo "$@" >> "$LOG_FILE"
+  echo "$( date ):" "$@" >> "$LOG_FILE"
+  if [[ "$(stat --format="%s" "$LOG_FILE")" -gt 1000000 ]]
+  then
+    local log_file2="${LOG_FILE}.2"
+    tail -n 5000 "$LOG_FILE" > "${log_file2}"
+    mv "$log_file2" "$LOG_FILE"
+    log "(log truncated)"
+  fi
 }
 
 function log_errors_on_exit {
@@ -664,18 +670,6 @@ function archive_clips () {
   /root/bin/disconnect-archive.sh
 }
 
-function truncate_log () {
-  local log_length
-  log_length=$( wc -l "$LOG_FILE" | cut -d' ' -f 1 )
-  if [ "$log_length" -gt 10000 ]
-  then
-    log "Truncating log..."
-    local log_file2="${LOG_FILE}.2"
-    tail -n 10000 "$LOG_FILE" > "${LOG_FILE}.2"
-    mv "$log_file2" "$LOG_FILE"
-  fi
-}
-
 function slowblink () {
   echo timer > "$STATUSLED/trigger" || return 0
   echo 900 > "$STATUSLED/delay_off"
@@ -885,8 +879,6 @@ do
   fi
 
   archive_clips
-
-  truncate_log
 
   /root/bin/awake_stop || true
 
