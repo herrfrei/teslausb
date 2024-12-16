@@ -357,7 +357,7 @@ function create_usb_drive_backing_files () {
         rm -f /tmp/allfiles.txt /tmp/stilloncard.txt
       fi
 
-      umount /mnt/cam
+      umount -l /mnt/cam || setup_progress "failed to unmount /mnt/cam"
     fi
 
     if [ -e /backingfiles/music_disk.bin ] && mount_with_retry /mnt/music

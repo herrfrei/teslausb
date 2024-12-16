@@ -86,6 +86,22 @@ function get_script () {
   chmod +x "$local_path/$name"
 }
 
+function nm_connect_wifi () {
+  IFS=". " read -r start_time _ < /proc/uptime
+
+  while ! nmcli device wifi connect "$SSID" password "$WIFIPASS"
+  do
+    IFS=". " read -r now _ < /proc/uptime
+    if [ $((now - start_time)) -gt 60 ]
+    then
+      setup_progress "failed to connect to wifi after 60 seconds, exiting"
+      return 1
+    fi
+    setup_progress "failed to connect to wifi, retrying"
+    sleep 5
+  done
+}
+
 function enable_wifi () {
   setup_progress "Detecting whether to configure wifi"
   if [[ -n "$SSID" ]] && [[ -n "$WIFIPASS" ]]
@@ -99,7 +115,12 @@ function enable_wifi () {
       if systemctl -q is-enabled NetworkManager.service
       then
         setup_progress "Connecting to wifi using Network Manager"
-        nmcli device wifi connect "$SSID" password "$WIFIPASS"
+        if ! nm_connect_wifi
+        then
+          setup_progress "Failed to connect to wifi"
+          error_strobe &
+          exit 0
+        fi
       else
         setup_progress "Configuring wpa_supplicant"
         cp /teslausb/wpa_supplicant.conf.sample /teslausb/wpa_supplicant.conf
