@@ -8,10 +8,13 @@
 # block a return to archiveloop.
 
 {
-  log "unmounting $ARCHIVE_MOUNT"
-  if ! umount -f -l "$ARCHIVE_MOUNT"
+  if [ -e "$ARCHIVE_MOUNT" ]
   then
-    log "unmount failed"
+    log "unmounting $ARCHIVE_MOUNT"
+    if ! umount -f -l "$ARCHIVE_MOUNT"
+    then
+      log "unmount failed"
+    fi
   fi
 
   if [ -e "$MUSIC_ARCHIVE_MOUNT" ]

@@ -150,6 +150,9 @@ function configure_archive () {
   then
     local sharenameforstab="${SHARE_NAME// /\\040}"
     echo "//$ARCHIVE_SERVER/$sharenameforstab $archive_path cifs noauto,credentials=${credentials_file_path},iocharset=utf8,file_mode=0777,dir_mode=0777,$VERS_OPT,$SEC_OPT 0" >> /etc/fstab
+  elif [ -d "$archive_path" ]
+  then
+    rmdir "$archive_path" || log_progress "failed to remove $archive_path"
   fi
 
   if [ -n "${MUSIC_SHARE_NAME:+x}" ]
@@ -160,6 +163,9 @@ function configure_archive () {
     fi
     local musicsharenameforstab="${MUSIC_SHARE_NAME// /\\040}"
     echo "//$ARCHIVE_SERVER/$musicsharenameforstab $music_archive_path cifs noauto,credentials=${credentials_file_path},iocharset=utf8,file_mode=0777,dir_mode=0777,$VERS_OPT,$SEC_OPT 0" >> /etc/fstab
+  elif [ -d "$music_archive_path" ]
+  then
+    rmdir "$music_archive_path" || log_progress "failed to remove $music_archive_path"
   fi
   log_progress "Configured the archive."
 }
