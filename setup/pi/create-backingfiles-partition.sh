@@ -159,7 +159,7 @@ LAST_DISK_SECTOR=$((DISK_SECTORS - 1))
 # mutable partition is 300MB at the end of the disk, calculate its start sector
 FIRST_MUTABLE_SECTOR=$((LAST_DISK_SECTOR-614400+1))
 # backingfiles partition sits between the last and mutable partition, calculate its start sector and size
-LAST_PART_SECTOR=$(sfdisk -q -l "${BOOT_DISK}" | tail +2 | sort -n -k 2 | tail -1 | awk '{print $3}')
+LAST_PART_SECTOR=$(sfdisk -o End -q -l "${BOOT_DISK}" | tail +2 | sort -n -k 2 | tail -1)
 FIRST_BACKINGFILES_SECTOR=$((LAST_PART_SECTOR + 1))
 BACKINGFILES_NUM_SECTORS=$((FIRST_MUTABLE_SECTOR - FIRST_BACKINGFILES_SECTOR))
 
