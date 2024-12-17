@@ -189,4 +189,8 @@ then
   echo "tmpfs /var/lib/ntp tmpfs nodev,nosuid 0 0" >> /etc/fstab
 fi
 
+# work around 'mount' warning that's printed when /etc/fstab is
+# newer than /run/systemd/systemd-units-load
+touch -t 197001010000 /etc/fstab
+
 log_progress "done"
