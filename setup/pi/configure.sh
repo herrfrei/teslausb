@@ -54,7 +54,10 @@ function check_variable () {
 # Check that the default rsync works correctly, and install a newer version
 # if needed.
 function check_default_rsync {
-  hash rsync
+  if ! hash rsync
+  then
+    apt install rsync
+  fi
 
   rm -rf /tmp/rsynctest
   mkdir -p /tmp/rsynctest/src /tmp/rsynctest/dst
