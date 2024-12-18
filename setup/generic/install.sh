@@ -55,8 +55,6 @@ lastpart=$(sfdisk -q -l "$rootdev" | tail +2 | sort -n -k 2 | tail -1 | awk '{pr
 
 # Check if there is sufficient unpartitioned space after the last
 # partition to create the backingfiles and mutable partitions.
-# TODO: provide a way to skip this, to support having boot+root on
-# eMMC or sd card, and storage elsewhere
 unpart=$(sfdisk -F "$rootdev" | grep -o '[0-9]* bytes' | head -1 | awk '{print $1}')
 if [ "${1:-}" != "norootshrink" ] && [ "$unpart" -lt  $(( (1<<30) * 32)) ]
 then
