@@ -58,7 +58,7 @@ lastpart=$(sfdisk -q -l "$rootdev" | tail +2 | sort -n -k 2 | tail -1 | awk '{pr
 # TODO: provide a way to skip this, to support having boot+root on
 # eMMC or sd card, and storage elsewhere
 unpart=$(sfdisk -F "$rootdev" | grep -o '[0-9]* bytes' | head -1 | awk '{print $1}')
-if [ "$unpart" -lt  $(( (1<<30) * 32)) ]
+if [ "${1:-}" != "norootshrink" ] && [ "$unpart" -lt  $(( (1<<30) * 32)) ]
 then
   # This script will only shrink the root partition, and if there's another
   # partition following the root partition, we won't be able to grow the
@@ -97,9 +97,6 @@ then
 		} | bash
 		EOF
     chmod a+x /etc/rc.local
-
-    # The user should have configured networking manually, so disable wifi setup
-    touch /teslausb/WIFI_ENABLED
 
     if [ ! -e "/boot/initrd.img-$(uname -r)" ]
     then
@@ -164,6 +161,9 @@ then
     sleep 1
   done
 fi
+
+# The user should have configured networking manually, so disable wifi setup
+touch /teslausb/WIFI_ENABLED
 
 # Copy our rc.local from github, which will allow setup to
 # continue using the regular "one step setup" process used
