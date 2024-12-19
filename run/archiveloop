@@ -830,10 +830,13 @@ fix_errors_in_images
 
 if has_cam_disk
 then
+  # don't need another fsck because fix_errors_in_images already did that
   /root/bin/make_snapshot.sh nofsck
 
   clean_cam_mount
 fi
+
+connect_usb_drives_to_host
 
 if archive_is_reachable
 then
@@ -852,10 +855,6 @@ then
   connect_usb_drives_to_host
 
   wait_for_archive_to_be_unreachable
-else
-  slowblink
-
-  connect_usb_drives_to_host
 fi
 
 while true
