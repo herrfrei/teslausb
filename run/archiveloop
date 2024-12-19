@@ -355,6 +355,19 @@ function intersect {
 }
 
 function clean_cam_mount {
+
+  if [ -e /tmp/last_clean_time ]
+  then
+    read -r -d . last < /tmp/last_clean_time
+    read -r -d . now < /proc/uptime
+    if (( (now - last) < 300 ))
+    then
+      log "skipping cleaning cam mount"
+      return
+    fi
+  fi
+  cat /proc/uptime > /tmp/last_clean_time
+
   log "cleaning cam mount"
   ensure_cam_file_is_mounted
 
@@ -615,7 +628,12 @@ function archive_teslacam_clips () {
   # overlayfs behavior is undefined if the lower is changed while the overlay is active, so umount first
   umount "$overlaymerged"
 
-  clean_cam_mount
+  if archive_is_reachable
+  then
+    clean_cam_mount
+  else
+    log "Archive not reachable, assuming user drove away, skipping cleaning step"
+  fi
 }
 
 function copy_music_files () {
