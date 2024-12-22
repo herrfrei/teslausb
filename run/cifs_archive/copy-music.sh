@@ -22,6 +22,7 @@ function connectionmonitor {
         sleep 5
         continue 2
       fi
+      sleep 1
     done
     log "connection dead, killing copy-music"
     # Give rsync a chance to clean up before killing it hard.

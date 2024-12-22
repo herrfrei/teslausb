@@ -11,6 +11,7 @@ function connectionmonitor {
         sleep 5
         continue 2
       fi
+      sleep 1
     done
     log "connection dead, killing archive-clips"
     # Since there can be a substantial delay before rsync deletes archived
