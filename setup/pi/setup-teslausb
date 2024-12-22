@@ -399,6 +399,10 @@ function configure_hostname () {
     sed -i -e "s/$old_host_name/$new_host_name/g" /etc/hostname
     while ! hostnamectl set-hostname "$new_host_name"
     do
+      if [ ! -e /lib/systemd/system/dbus.service ]
+      then
+        break
+      fi
       setup_progress "hostnamectl failed, retrying"
       sleep 1
     done
