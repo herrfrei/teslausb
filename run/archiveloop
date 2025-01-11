@@ -662,28 +662,40 @@ function archive_clips () {
     return
   fi
 
+  /root/bin/send-push-message "$NOTIFICATION_TITLE:" "Start archiving" start || log "failed to send push message"
+  local message="Stop archiving - CAM: "
+
   if ! has_cam_disk
   then
     log "Skipping archiving (no cam disk)"
+    message+="skipped "
   elif archive_teslacam_clips
   then
     log "Finished archiving."
+    message+="finished "
   else
     log "Archiving failed."
+    message+="failed "
   fi
 
+  message+=" MUSIC: "
   if timeout 5 [ -d "$MUSIC_ARCHIVE_MOUNT" -a -d "$MUSIC_MOUNT" ]
   then
     log "Copying music..."
     if copy_music_files
     then
       log "Finished copying music."
+      message+="finished"
     else
       log "Copying music failed."
+      message+="failed"
     fi
   else
     log "Music archive not configured or unreachable"
+    message+="not configured or unreachable"
   fi
+
+  /root/bin/send-push-message "$NOTIFICATION_TITLE:" "$message" finish || log "failed to send push message"
 
   /root/bin/disconnect-archive.sh
 }
