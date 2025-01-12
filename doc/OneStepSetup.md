@@ -10,7 +10,7 @@ This is a streamlined process for setting up the Pi. You'll flash a preconfigure
 
 ## Configure the SD card before first boot of the Pi
 
-1.  Flash the [latest image release](https://github.com/marcone/teslausb/releases) using [Raspberry Pi Imager](https://www.raspberrypi.com/software/) or a similar flashing tool.
+1.  Flash the [latest image release](https://github.com/marcone/teslausb/releases/latest) using [Raspberry Pi Imager](https://www.raspberrypi.com/software/) or a similar flashing tool.
 
     In Raspberry Pi Imager, you need to click 'Operating System' and then scroll _all the way down_ and select the 'Use custom' option.
 
