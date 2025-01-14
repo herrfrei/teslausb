@@ -1,8 +1,17 @@
 #!/bin/bash -eu
 
-if [[ ( ( ! -x /root/bin/tesla_api.py) || ( ! -s /mutable/cache.json ) ) && ( -z "${TESLAFI_API_TOKEN:+x}" ) && ( -z "${TESSIE_API_TOKEN:+x}" ) ]]
+if [[ ( ( ! -x /root/bin/tesla_api.py) || ( ! -s /mutable/cache.json ) ) && ( -z "${TESLAFI_API_TOKEN:+x}" ) && ( -z "${TESSIE_API_TOKEN:+x}" ) && ( -z "${WEBHOOK_WAKE_URL:+x}" ) ]]
 then
   log "Not keeping car awake."
+  exit
+fi
+
+if [[ ( -n "${WEBHOOK_WAKE_URL:+x}" ) ]]; then
+  log "Sending Webhook message to keep car awake."
+  curl -X POST \
+    -d "{\"value1\":\"awake\",\"value2\":\"Sentry on\"}" \
+    -H "Content-Type: application/json" \
+    "$WEBHOOK_WAKE_URL"
   exit
 fi
 

@@ -287,6 +287,11 @@ export WIFIPASS='your_pass'
 # The Tessie API requires the vehicle's VIN number to issue commands to it,
 # regardless of whether you only have one vehicle on the account or not.
 # export TESSIE_VIN=5YJ3E1EA4JF000001
+#
+# Use Webhook to enable / disable sentry mode
+# Fill and uncomment WEBHOOK_WAKE_URL with a valid URL to send "Sentry on"
+# and "Sentry off" messages before and after the archiving process.
+# export WEBHOOK_WAKE_URL=http://domain/path
 ############################################################################
 
 
